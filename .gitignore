@@ -1,38 +1,25 @@
-# Maven
-target/
-*.jar
-*.war
-*.ear
-*.zip
-*.tar.gz
-
 # IDE
 .idea/
 *.iml
-.project
-.classpath
-.settings/
 
-# OS
+# Build - исключаем ВСЁ, кроме allure-results
+target/
+!target/allure-results/
+
+# System
 .DS_Store
-Thumbs.db
+
+# Tools (ВСЁ что в tools/)
+tools/
 
 # Logs
 *.log
+logs/
 
-# Allure отчеты
-allure-report/
-allure-results/
+# Maven
+dependency-reduced-pom.xml
 
-# Исключение для allure-results внутри target (чтобы коммитить)
-!target/allure-results/
-target/allure-results/*.txt
-target/allure-results/*.tmp
-.allure/
-allure-*/
-allure-current
-# Allure reports and binaries
-.allure/
-allure-*/
-allure-current
-tools/allure/allure-2.24.0/
+# Test reports (кроме allure-results)
+surefire-reports/
+failsafe-reports/
+test-output/
