@@ -1,8 +1,11 @@
 package models;
 
+import lombok.Getter;
+
 import java.util.Arrays;
 
 @SuppressWarnings("unused")
+@Getter
 public class Order {
     private final String firstName;
     private final String lastName;
@@ -26,39 +29,6 @@ public class Order {
         this.deliveryDate = deliveryDate;
         this.comment = comment;
         this.color = color != null ? color.clone() : new String[0]; // защитная копия
-    }
-
-    // Геттеры
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getMetroStation() {
-        return metroStation;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public int getRentTime() {
-        return rentTime;
-    }
-
-    public String getDeliveryDate() {
-        return deliveryDate;
-    }
-
-    public String getComment() {
-        return comment;
     }
 
     public String[] getColor() {

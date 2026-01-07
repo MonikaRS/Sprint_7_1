@@ -1,25 +1,37 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
 # IDE
 .idea/
 *.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+*.swp
+*.swo
 
-# Build - исключаем ВСЁ, кроме allure-results
-target/
-!target/allure-results/
-
-# System
+# OS
 .DS_Store
-
-# Tools (ВСЁ что в tools/)
-tools/
+Thumbs.db
 
 # Logs
 *.log
 logs/
 
-# Maven
-dependency-reduced-pom.xml
+# Backups
+*backup*
+*.tar.gz
+*.zip
+*.bak
 
-# Test reports (кроме allure-results)
-surefire-reports/
-failsafe-reports/
-test-output/
+# Allure
+allure-results/
+allure-report/
