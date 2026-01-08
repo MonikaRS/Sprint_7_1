@@ -29,11 +29,26 @@ import java.util.Map;
 public class CourierAuthTest {
 
     private CourierApi courierApi;
+    private Courier testCourier;
     private final Map<String, String> createdCouriers = new HashMap<>();
 
     @Before
     public void setUp() {
         courierApi = new CourierApi();
+        
+        // Создаем тестового курьера для всех тестов
+        testCourier = new Courier(
+            TestDataGenerator.generateRandomLogin(),
+            TestDataGenerator.generateRandomPassword(),
+            TestDataGenerator.generateRandomFirstName()
+        );
+        
+        // Создаем курьера в системе
+        Response createResponse = courierApi.createCourier(testCourier);
+        createResponse.then().statusCode(SC_CREATED);
+        
+        // Сохраняем для очистки после тестов
+        createdCouriers.put(testCourier.getLogin(), testCourier.getPassword());
     }
 
     @After
@@ -60,18 +75,23 @@ public class CourierAuthTest {
 
     @Test
     @Story("Авторизация курьера")
+    @DisplayName("Успешная авторизация курьера")
+    @Description("Проверка успешной авторизации с валидными данными")
+    @Severity(SeverityLevel.CRITICAL)
+    public void testLoginCourierSuccess() {
+        courierApi.loginCourier(testCourier)
+                .then()
+                .statusCode(SC_OK)
+                .body("id", notNullValue());
+    }
+
+    @Test
+    @Story("Авторизация курьера")
     @DisplayName("Авторизация без логина")
     @Description("Проверка авторизации без указания логина")
     @Severity(SeverityLevel.NORMAL)
     public void testLoginWithoutLogin() {
-        String password = TestDataGenerator.generateRandomPassword();
-        String login = TestDataGenerator.generateRandomLogin();
-        
-        courierApi.createCourier(
-                new Courier(login, password, TestDataGenerator.generateRandomFirstName())
-        ).then().statusCode(SC_CREATED);
-
-        Courier courierWithoutLogin = new Courier("", password, "");
+        Courier courierWithoutLogin = new Courier("", testCourier.getPassword(), "");
         Response response = courierApi.loginCourier(courierWithoutLogin);
         int statusCode = response.getStatusCode();
 
@@ -82,8 +102,6 @@ public class CourierAuthTest {
         } else {
             throw new AssertionError("Неожиданный статус код: " + statusCode + ". Ожидался 400 или 504");
         }
-
-        createdCouriers.put(login, password);
     }
 
     @Test
@@ -92,14 +110,7 @@ public class CourierAuthTest {
     @Description("Проверка авторизации без указания пароля")
     @Severity(SeverityLevel.NORMAL)
     public void testLoginWithoutPassword() {
-        String login = TestDataGenerator.generateRandomLogin();
-        String password = TestDataGenerator.generateRandomPassword();
-        
-        courierApi.createCourier(
-                new Courier(login, password, TestDataGenerator.generateRandomFirstName())
-        ).then().statusCode(SC_CREATED);
-
-        Courier courierWithoutPassword = new Courier(login, "", "");
+        Courier courierWithoutPassword = new Courier(testCourier.getLogin(), "", "");
         Response response = courierApi.loginCourier(courierWithoutPassword);
         int statusCode = response.getStatusCode();
 
@@ -110,19 +121,17 @@ public class CourierAuthTest {
         } else {
             throw new AssertionError("Неожиданный статус код: " + statusCode + ". Ожидался 400 или 504");
         }
-
-        createdCouriers.put(login, password);
     }
 
     @Test
     @Story("Авторизация курьера")
-    @DisplayName("Аворизация с неверным логином")
+    @DisplayName("Авторизация с неверным логином")
     @Description("Проверка авторизации с неверным логином")
     @Severity(SeverityLevel.NORMAL)
     public void testLoginWithWrongLogin() {
         Courier courier = new Courier(
                 "nonexistent_login_" + System.currentTimeMillis(),
-                TestDataGenerator.generateRandomPassword(),
+                testCourier.getPassword(),
                 TestDataGenerator.generateRandomFirstName()
         );
 
@@ -144,15 +153,12 @@ public class CourierAuthTest {
     @Description("Проверка авторизации с неправильным паролем")
     @Severity(SeverityLevel.NORMAL)
     public void testLoginWithWrongPassword() {
-        String login = TestDataGenerator.generateRandomLogin();
-        String password = TestDataGenerator.generateRandomPassword();
-        Courier courier = new Courier(login, password, TestDataGenerator.generateRandomFirstName());
-
-        courierApi.createCourier(courier)
-                .then()
-                .statusCode(SC_CREATED);
-
-        Courier wrongCourier = new Courier(login, "wrong_password", courier.getFirstName());
+        Courier wrongCourier = new Courier(
+            testCourier.getLogin(), 
+            "wrong_password", 
+            testCourier.getFirstName()
+        );
+        
         Response response = courierApi.loginCourier(wrongCourier);
         int statusCode = response.getStatusCode();
 
@@ -163,29 +169,5 @@ public class CourierAuthTest {
         } else {
             throw new AssertionError("Неожиданный статус код: " + statusCode + ". Ожидался 404 или 504");
         }
-
-        createdCouriers.put(login, password);
-    }
-
-    @Test
-    @Story("Авторизация курьера")
-    @DisplayName("Успешная авторизация курьера")
-    @Description("Проверка успешной авторизации курьера")
-    @Severity(SeverityLevel.CRITICAL)
-    public void testLoginCourierSuccess() {
-        String login = TestDataGenerator.generateRandomLogin();
-        String password = TestDataGenerator.generateRandomPassword();
-        Courier courier = new Courier(login, password, TestDataGenerator.generateRandomFirstName());
-
-        courierApi.createCourier(courier)
-                .then()
-                .statusCode(SC_CREATED);
-
-        courierApi.loginCourier(courier)
-                .then()
-                .statusCode(SC_OK)
-                .body("id", notNullValue());
-
-        createdCouriers.put(login, password);
     }
 }
